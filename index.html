@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Shopee Price Scout</title>
+  <meta name="description" content="Comparador reutilizável de preços da Shopee." />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">ORBIT IA · PRICE INTELLIGENCE</div>
+        <h1>Shopee <span>Price Scout</span></h1>
+        <p>Pesquise um produto, compare ofertas e reutilize o mesmo comparador trocando apenas o nome do produto.</p>
+      </div>
+      <div class="status"><span></span><div><strong>Comparador reutilizável</strong><small>Sem bypass de CAPTCHA ou anti-bot</small></div></div>
+    </header>
+
+    <main>
+      <section class="card search-card">
+        <div class="search-row">
+          <div class="field grow"><label for="query">Produto</label><input id="query" autocomplete="off" placeholder="Ex.: iPhone 15 128GB" /></div>
+          <button id="compareBtn" class="primary">Comparar</button>
+          <button id="openShopeeBtn" class="secondary">Pesquisar na Shopee</button>
+        </div>
+        <div class="subrow"><span>Configuração rápida: <code>PRODUCT_NAME</code> em <code>product-config.js</code></span><span class="badge">PRONTO PARA API OFICIAL</span></div>
+      </section>
+
+      <section class="metrics">
+        <article class="card metric"><small>Menor total</small><strong id="minPrice">—</strong><span>melhor oferta</span></article>
+        <article class="card metric"><small>Preço médio</small><strong id="avgPrice">—</strong><span>entre resultados</span></article>
+        <article class="card metric"><small>Maior total</small><strong id="maxPrice">—</strong><span>referência</span></article>
+        <article class="card metric"><small>Economia</small><strong id="saving">—</strong><span>menor × maior</span></article>
+      </section>
+
+      <section class="card controls">
+        <div class="field"><label for="sort">Ordenar</label><select id="sort"><option value="total">Menor preço total</option><option value="price">Menor preço do produto</option><option value="rating">Melhor avaliação</option><option value="sold">Mais vendidos</option></select></div>
+        <div class="field"><label for="minFilter">Preço mínimo</label><input id="minFilter" type="number" min="0" step="0.01" placeholder="0" /></div>
+        <div class="field"><label for="maxFilter">Preço máximo</label><input id="maxFilter" type="number" min="0" step="0.01" placeholder="Sem limite" /></div>
+        <label class="check"><input id="includeShipping" type="checkbox" checked /> Considerar frete</label>
+        <button id="addBtn" class="ghost">+ Adicionar oferta</button>
+      </section>
+
+      <section id="apiNotice" class="notice"><strong>Modo atual:</strong> nenhum preço é inventado. Enquanto credenciais de uma integração oficial não estiverem configuradas, abra a busca da Shopee e adicione ofertas reais ao comparador.</section>
+
+      <section class="results-head"><div><h2>Ofertas</h2><p id="resultCount">0 ofertas no comparador</p></div><button id="clearBtn" class="link-btn">Limpar ofertas</button></section>
+      <section id="results" class="results"></section>
+
+      <section id="empty" class="card empty">
+        <div class="empty-icon">⌕</div>
+        <h3>Nenhuma oferta adicionada</h3>
+        <p>Use “Pesquisar na Shopee”, abra anúncios reais e adicione preço, frete, loja, avaliação e link. O comparador recalcula tudo automaticamente.</p>
+        <button id="emptySearch" class="primary">Pesquisar produto</button>
+      </section>
+
+      <section class="card script-card">
+        <div><div class="eyebrow">MODO SCRIPT</div><h2>Troque apenas o nome</h2><p>Altere somente <code>PRODUCT_NAME</code>. Filtros, ordenação, métricas e armazenamento permanecem iguais.</p></div>
+        <pre><code>window.PRODUCT_NAME = "SEU NOVO PRODUTO";</code></pre>
+      </section>
+    </main>
+
+    <footer>Shopee Price Scout · Orbit IA · Comparador independente</footer>
+  </div>
+
+  <dialog id="offerDialog">
+    <form id="offerForm">
+      <div class="dialog-head"><div><div class="eyebrow">NOVA OFERTA</div><h3>Adicionar ao comparador</h3></div><button id="closeDialog" type="button" class="icon-btn">×</button></div>
+      <div class="form-grid">
+        <div class="field full"><label>Nome do anúncio</label><input name="title" required /></div>
+        <div class="field"><label>Preço (R$)</label><input name="price" type="number" min="0" step="0.01" required /></div>
+        <div class="field"><label>Frete (R$)</label><input name="shipping" type="number" min="0" step="0.01" value="0" /></div>
+        <div class="field"><label>Loja</label><input name="seller" /></div>
+        <div class="field"><label>Avaliação</label><input name="rating" type="number" min="0" max="5" step="0.1" /></div>
+        <div class="field"><label>Vendidos</label><input name="sold" type="number" min="0" step="1" /></div>
+        <div class="field full"><label>Link da Shopee</label><input name="url" type="url" placeholder="https://shopee.com.br/..." /></div>
+      </div>
+      <div class="dialog-actions"><button id="cancelDialog" type="button" class="secondary">Cancelar</button><button class="primary" type="submit">Adicionar oferta</button></div>
+    </form>
+  </dialog>
+
+  <script src="/product-config.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
