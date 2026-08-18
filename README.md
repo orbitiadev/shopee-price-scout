@@ -2,6 +2,8 @@
 
 Radar pessoal de promoções da Orbit IA para monitorar ofertas da Shopee, registrar histórico de preços e gerar conteúdo pronto para Telegram e TikTok.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Forbitiadev%2Fshopee-price-scout&project-name=shopee-price-scout&repository-name=shopee-price-scout)
+
 ## O que já existe
 
 - comparação por preço + frete;
@@ -78,6 +80,8 @@ Edite `product-config.js`:
 window.PRODUCT_NAME = "SEU NOVO PRODUTO";
 ```
 
-## Deploy
+## Deploy no Vercel
 
-O projeto continua estático no frontend e inclui `vercel.json`. O backend de Telegram roda como Supabase Edge Function.
+O projeto é estático no frontend e inclui `vercel.json`. O backend de Telegram roda como Supabase Edge Function.
+
+Para uso pessoal, clique no botão **Deploy with Vercel** no topo deste README. O fluxo já aponta para `orbitiadev/shopee-price-scout` e sugere o nome `shopee-price-scout`. Depois da importação, a integração Git do Vercel pode publicar novamente a cada push na `main`.
