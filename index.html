@@ -5,28 +5,170 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
   <title>Shopee Price Scout</title>
-  <meta name="description" content="Comparador reutilizável de preços da Shopee." />
+  <meta name="description" content="Radar pessoal de promoções, histórico de preços e gerador de conteúdo para Shopee." />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <div class="shell">
     <header class="hero">
-      <div><div class="eyebrow">ORBIT IA · PRICE INTELLIGENCE</div><h1>Shopee <span>Price Scout</span></h1><p>Pesquise um produto, compare ofertas e reutilize o mesmo comparador trocando apenas o nome do produto.</p></div>
-      <div class="status"><span></span><div><strong id="syncStatus">Iniciando sincronização</strong><small>Supabase + fallback local</small></div></div>
+      <div>
+        <div class="eyebrow">ORBIT IA · PRICE INTELLIGENCE</div>
+        <h1>Shopee <span>Price Scout</span></h1>
+        <p>Radar pessoal de ofertas com histórico de preço, classificação automática e geração de promoções para Telegram e TikTok.</p>
+      </div>
+      <div class="status">
+        <span></span>
+        <div>
+          <strong id="syncStatus">Iniciando...</strong>
+          <small id="ownerStatus">Supabase + fallback local</small>
+        </div>
+      </div>
     </header>
+
     <main>
-      <section class="card search-card"><div class="search-row"><div class="field grow"><label for="query">Produto</label><input id="query" autocomplete="off" placeholder="Ex.: iPhone 15 128GB" /></div><button id="compareBtn" class="primary">Comparar</button><button id="openShopeeBtn" class="secondary">Pesquisar na Shopee</button></div><div class="subrow"><span>Configuração rápida: <code>PRODUCT_NAME</code> em <code>product-config.js</code></span><span class="badge">SUPABASE INTEGRADO</span></div></section>
-      <section class="metrics"><article class="card metric"><small>Menor total</small><strong id="minPrice">—</strong><span>melhor oferta</span></article><article class="card metric"><small>Preço médio</small><strong id="avgPrice">—</strong><span>entre resultados</span></article><article class="card metric"><small>Maior total</small><strong id="maxPrice">—</strong><span>referência</span></article><article class="card metric"><small>Economia</small><strong id="saving">—</strong><span>menor × maior</span></article></section>
-      <section class="card controls"><div class="field"><label for="sort">Ordenar</label><select id="sort"><option value="total">Menor preço total</option><option value="price">Menor preço do produto</option><option value="rating">Melhor avaliação</option><option value="sold">Mais vendidos</option></select></div><div class="field"><label for="minFilter">Preço mínimo</label><input id="minFilter" type="number" min="0" step="0.01" placeholder="0" /></div><div class="field"><label for="maxFilter">Preço máximo</label><input id="maxFilter" type="number" min="0" step="0.01" placeholder="Sem limite" /></div><label class="check"><input id="includeShipping" type="checkbox" checked /> Considerar frete</label><button id="addBtn" class="ghost">+ Adicionar oferta</button></section>
-      <section id="apiNotice" class="notice"><strong>Modo atual:</strong> o Supabase guarda suas ofertas com RLS por usuário. Se o Auth anônimo estiver desabilitado, o app continua funcionando com armazenamento local até ele ser ativado.</section>
-      <section class="results-head"><div><h2>Ofertas</h2><p id="resultCount">0 ofertas no comparador</p></div><button id="clearBtn" class="link-btn">Limpar ofertas</button></section>
+      <section class="card search-card">
+        <div class="search-row">
+          <div class="field grow">
+            <label for="query">Produto</label>
+            <input id="query" autocomplete="off" placeholder="Ex.: iPhone 15 128GB" />
+          </div>
+          <button id="compareBtn" class="primary">Comparar</button>
+          <button id="openShopeeBtn" class="secondary">Pesquisar na Shopee</button>
+        </div>
+        <div class="subrow">
+          <span>Troca rápida: <code>PRODUCT_NAME</code> em <code>product-config.js</code></span>
+          <span class="badge">HISTÓRICO + PROMO STUDIO</span>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <article class="card metric"><small>Menor total</small><strong id="minPrice">—</strong><span>melhor oferta atual</span></article>
+        <article class="card metric"><small>Preço médio</small><strong id="avgPrice">—</strong><span>entre resultados</span></article>
+        <article class="card metric"><small>Maior total</small><strong id="maxPrice">—</strong><span>referência atual</span></article>
+        <article class="card metric"><small>Maior economia</small><strong id="saving">—</strong><span>preço de referência × atual</span></article>
+      </section>
+
+      <section class="card controls">
+        <div class="field">
+          <label for="sort">Ordenar</label>
+          <select id="sort">
+            <option value="total">Menor preço total</option>
+            <option value="discount">Maior desconto</option>
+            <option value="price">Menor preço do produto</option>
+            <option value="rating">Melhor avaliação</option>
+            <option value="sold">Mais vendidos</option>
+          </select>
+        </div>
+        <div class="field"><label for="minFilter">Preço mínimo</label><input id="minFilter" type="number" min="0" step="0.01" placeholder="0" /></div>
+        <div class="field"><label for="maxFilter">Preço máximo</label><input id="maxFilter" type="number" min="0" step="0.01" placeholder="Sem limite" /></div>
+        <label class="check"><input id="includeShipping" type="checkbox" checked /> Considerar frete</label>
+        <button id="addBtn" class="ghost">+ Capturar oferta</button>
+      </section>
+
+      <section id="apiNotice" class="notice">
+        <strong>Dados reais:</strong> o app não inventa preços. Hoje você pode capturar ofertas manualmente; a busca automática da API oficial da Shopee fica preparada para ser ligada quando as credenciais forem configuradas.
+      </section>
+
+      <section class="results-head">
+        <div>
+          <h2>Ofertas monitoradas</h2>
+          <p id="resultCount">0 ofertas no comparador</p>
+        </div>
+        <div class="head-actions">
+          <button id="copyOwnerIdBtn" class="link-btn">Copiar meu ID Supabase</button>
+          <button id="clearBtn" class="link-btn danger-text">Limpar ofertas</button>
+        </div>
+      </section>
+
       <section id="results" class="results"></section>
-      <section id="empty" class="card empty"><div class="empty-icon">⌕</div><h3>Nenhuma oferta adicionada</h3><p>Use “Pesquisar na Shopee”, abra anúncios reais e adicione preço, frete, loja, avaliação e link.</p><button id="emptySearch" class="primary">Pesquisar produto</button></section>
-      <section class="card script-card"><div><div class="eyebrow">MODO SCRIPT</div><h2>Troque apenas o nome</h2><p>Altere somente <code>PRODUCT_NAME</code>. Filtros, ordenação, métricas e sincronização permanecem iguais.</p></div><pre><code>window.PRODUCT_NAME = "SEU NOVO PRODUTO";</code></pre></section>
+
+      <section id="empty" class="card empty">
+        <div class="empty-icon">⌕</div>
+        <h3>Nenhuma oferta monitorada</h3>
+        <p>Pesquise na Shopee e use “Capturar oferta”. Se capturar o mesmo anúncio novamente, o preço atual é atualizado e uma nova entrada é adicionada ao histórico.</p>
+        <button id="emptySearch" class="primary">Pesquisar produto</button>
+      </section>
+
+      <section id="promoStudio" class="card promo-studio">
+        <div class="promo-copy">
+          <div class="eyebrow">PROMO STUDIO</div>
+          <div class="promo-title-row">
+            <div>
+              <h2>Gerador Telegram + TikTok</h2>
+              <p id="promoHint">Escolha “Gerar promoção” em uma oferta.</p>
+            </div>
+            <span id="promoClass" class="promo-class normal">Preço normal</span>
+          </div>
+
+          <div class="promo-stats">
+            <div><small>Preço antigo</small><strong id="promoOld">—</strong></div>
+            <div><small>Preço atual</small><strong id="promoCurrent">—</strong></div>
+            <div><small>Desconto</small><strong id="promoDiscount">—</strong></div>
+            <div><small>Economia</small><strong id="promoSavings">—</strong></div>
+          </div>
+
+          <div class="field">
+            <label for="promoCaption">Legenda pronta</label>
+            <textarea id="promoCaption" rows="10" placeholder="A legenda será gerada aqui."></textarea>
+          </div>
+          <div class="field">
+            <label for="promoHashtags">Hashtags</label>
+            <input id="promoHashtags" placeholder="#promocao #shopee #ofertas" />
+          </div>
+
+          <div class="promo-actions">
+            <button id="copyCaptionBtn" class="secondary" disabled>Copiar legenda</button>
+            <button id="downloadCardBtn" class="secondary" disabled>Baixar card 1080×1920</button>
+            <button id="telegramBtn" class="primary" disabled>Publicar no Telegram</button>
+          </div>
+          <p id="telegramStatus" class="microcopy">Telegram: backend criado; publicação será liberada após configurar o bot e o canal.</p>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="promoCanvas" width="1080" height="1920" aria-label="Prévia do card vertical"></canvas>
+        </div>
+      </section>
+
+      <section class="card script-card">
+        <div>
+          <div class="eyebrow">FLUXO PESSOAL</div>
+          <h2>Preço → promoção → conteúdo</h2>
+          <p>O histórico detecta quedas reais de preço. O Promo Studio transforma a melhor oferta em card vertical, legenda e hashtags; o backend do Telegram já está preparado para publicar automaticamente.</p>
+        </div>
+        <pre><code>🔥 Imperdível: ≥ 15%
+🟢 Boa oferta: ≥ 5%
+🟡 Preço normal: &lt; 5%</code></pre>
+      </section>
     </main>
-    <footer>Shopee Price Scout · Orbit IA · Comparador independente</footer>
+
+    <footer>Shopee Price Scout · Orbit IA · Uso pessoal</footer>
   </div>
-  <dialog id="offerDialog"><form id="offerForm"><div class="dialog-head"><div><div class="eyebrow">NOVA OFERTA</div><h3>Adicionar ao comparador</h3></div><button id="closeDialog" type="button" class="icon-btn">×</button></div><div class="form-grid"><div class="field full"><label>Nome do anúncio</label><input name="title" required /></div><div class="field"><label>Preço (R$)</label><input name="price" type="number" min="0" step="0.01" required /></div><div class="field"><label>Frete (R$)</label><input name="shipping" type="number" min="0" step="0.01" value="0" /></div><div class="field"><label>Loja</label><input name="seller" /></div><div class="field"><label>Avaliação</label><input name="rating" type="number" min="0" max="5" step="0.1" /></div><div class="field"><label>Vendidos</label><input name="sold" type="number" min="0" step="1" /></div><div class="field full"><label>Link da Shopee</label><input name="url" type="url" placeholder="https://shopee.com.br/..." /></div></div><div class="dialog-actions"><button id="cancelDialog" type="button" class="secondary">Cancelar</button><button class="primary" type="submit">Adicionar oferta</button></div></form></dialog>
+
+  <dialog id="offerDialog">
+    <form id="offerForm">
+      <div class="dialog-head">
+        <div><div class="eyebrow">CAPTURA DE PREÇO</div><h3>Adicionar ou atualizar oferta</h3></div>
+        <button id="closeDialog" type="button" class="icon-btn">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="field full"><label>Nome do anúncio</label><input name="title" required maxlength="500" /></div>
+        <div class="field"><label>Preço atual (R$)</label><input name="price" type="number" min="0" step="0.01" required /></div>
+        <div class="field"><label>Preço antigo / referência (R$)</label><input name="reference_price" type="number" min="0" step="0.01" placeholder="Opcional" /></div>
+        <div class="field"><label>Frete (R$)</label><input name="shipping" type="number" min="0" step="0.01" value="0" /></div>
+        <div class="field"><label>Loja</label><input name="seller" maxlength="200" /></div>
+        <div class="field"><label>Avaliação</label><input name="rating" type="number" min="0" max="5" step="0.1" /></div>
+        <div class="field"><label>Vendidos</label><input name="sold" type="number" min="0" step="1" /></div>
+        <div class="field full"><label>Link da Shopee</label><input name="url" type="url" placeholder="https://shopee.com.br/..." maxlength="2000" /></div>
+      </div>
+      <div class="dialog-actions">
+        <button id="cancelDialog" type="button" class="secondary">Cancelar</button>
+        <button class="primary" type="submit">Salvar captura</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js"></script>
   <script src="/product-config.js"></script>
   <script src="/app.js"></script>
